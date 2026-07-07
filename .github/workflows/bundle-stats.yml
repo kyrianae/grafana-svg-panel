@@ -1,27 +1,45 @@
-name: Bundle Stats
+name: Build grafana-svg-panel
 
 on:
   workflow_dispatch:
-  pull_request:
-    branches:
-      - main
   push:
     branches:
+      - master
       - main
 
-permissions:
-  contents: read
-  pull-requests: write
-  actions: read
-
 jobs:
-  compare:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
-        with:
-          persist-credentials: false
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - uses: grafana/plugin-actions/bundle-size@bundle-size/v1.0.2
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 14
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Install Grunt
+        run: npm install -g grunt-cli
+
+      - name: Build
+        run: grunt
+
+      - name: Archive plugin
+        run: |
+          mkdir artifact
+          cp -R dist artifact/ || true
+          cp -R src artifact/ || true
+          cp plugin.json artifact/ || true
+          cp package.json artifact/ || true
+          cp README.md artifact/ || true
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: grafana-svg-panel
+          path: artifact
