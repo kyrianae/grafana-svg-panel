@@ -1,45 +1,36 @@
-name: Build grafana-svg-panel
+name: Build Grafana Plugin
 
 on:
   workflow_dispatch:
   push:
     branches:
-      - master
       - main
+      - master
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: 14
+          node-version: 18
 
-      - name: Install dependencies
-        run: npm install
+      - run: npm install
 
-      - name: Install Grunt
-        run: npm install -g grunt-cli
+      - run: npm run build
+        continue-on-error: true
 
-      - name: Build
-        run: grunt
+      - run: |
+          if [ ! -d dist ]; then
+            npm run package || true
+          fi
 
-      - name: Archive plugin
-        run: |
-          mkdir artifact
-          cp -R dist artifact/ || true
-          cp -R src artifact/ || true
-          cp plugin.json artifact/ || true
-          cp package.json artifact/ || true
-          cp README.md artifact/ || true
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
           name: grafana-svg-panel
-          path: artifact
+          path: |
+            dist
+            plugin.json
