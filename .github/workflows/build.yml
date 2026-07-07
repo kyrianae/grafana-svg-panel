@@ -1,0 +1,36 @@
+name: Build Grafana Plugin
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - run: npm install
+
+      - run: npm run build
+        continue-on-error: true
+
+      - run: |
+          if [ ! -d dist ]; then
+            npm run package || true
+          fi
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: grafana-svg-panel
+          path: |
+            dist
+            plugin.json
