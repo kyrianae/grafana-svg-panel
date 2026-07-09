@@ -1,6 +1,6 @@
 import { FieldType, StandardEditorProps } from '@grafana/data';
 import { Button, Field, Input, Select } from '@grafana/ui';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { SvgBinding, SvgBindingAction } from '../types';
 
 type SelectOption = {
@@ -8,7 +8,7 @@ type SelectOption = {
   value: string;
 };
 
-const BINDING_ACTION_OPTIONS: Array<SelectOption> = [
+const BINDING_ACTION_OPTIONS: SelectOption[] = [
   { label: 'Fill color', value: 'fill' },
   { label: 'Stroke color', value: 'stroke' },
   { label: 'Text content', value: 'text' },
@@ -63,10 +63,10 @@ function withSelectedBinding(bindings: SvgBinding[], selectedIndex: number): Svg
   }));
 }
 
-function getSeriesOptions(context: StandardEditorProps<string>['context']): Array<SelectOption> {
+function getSeriesOptions(context: StandardEditorProps<string>['context']): SelectOption[] {
   const data = context.data ?? [];
   const seen = new Set<string>();
-  const options: Array<SelectOption> = [];
+  const options: SelectOption[] = [];
 
   data.forEach((frame) => {
     frame.fields.forEach((field) => {
@@ -97,27 +97,14 @@ export function BindingRulesEditor({ value, onChange, context }: StandardEditorP
 
   const bindings = useMemo(() => parseBindingsJson(value ?? ''), [value]);
   const seriesOptions = useMemo(() => getSeriesOptions(context), [context]);
-  const selectedBinding = bindings[selectedBindingIndex];
+  const selectedIndexFromJson = bindings.findIndex((binding) => binding.selected);
+  const effectiveSelectedBindingIndex =
+    bindings.length === 0
+      ? 0
+      : Math.min(Math.max(selectedIndexFromJson >= 0 ? selectedIndexFromJson : selectedBindingIndex, 0), bindings.length - 1);
+  const selectedBinding = bindings[effectiveSelectedBindingIndex];
 
-  useEffect(() => {
-    const selectedIndexFromJson = bindings.findIndex((binding) => binding.selected);
-
-    if (selectedIndexFromJson >= 0 && selectedIndexFromJson !== selectedBindingIndex) {
-      setSelectedBindingIndex(selectedIndexFromJson);
-      return;
-    }
-
-    if (bindings.length === 0) {
-      setSelectedBindingIndex(0);
-      return;
-    }
-
-    if (selectedBindingIndex > bindings.length - 1) {
-      setSelectedBindingIndex(bindings.length - 1);
-    }
-  }, [bindings, selectedBindingIndex]);
-
-  const setBindings = (nextBindings: SvgBinding[], preferredSelectedIndex = selectedBindingIndex) => {
+  const setBindings = (nextBindings: SvgBinding[], preferredSelectedIndex = effectiveSelectedBindingIndex) => {
     if (nextBindings.length === 0) {
       onChange(formatBindingsJson([]));
       setSelectedBindingIndex(0);
@@ -150,8 +137,8 @@ export function BindingRulesEditor({ value, onChange, context }: StandardEditorP
       return;
     }
 
-    const nextBindings = bindings.filter((_, index) => index !== selectedBindingIndex);
-    setBindings(nextBindings, Math.max(0, selectedBindingIndex - 1));
+    const nextBindings = bindings.filter((_, index) => index !== effectiveSelectedBindingIndex);
+    setBindings(nextBindings, Math.max(0, effectiveSelectedBindingIndex - 1));
   };
 
   const moveSelectedBinding = (direction: 'up' | 'down') => {
@@ -159,15 +146,15 @@ export function BindingRulesEditor({ value, onChange, context }: StandardEditorP
       return;
     }
 
-    const targetIndex = direction === 'up' ? selectedBindingIndex - 1 : selectedBindingIndex + 1;
+    const targetIndex = direction === 'up' ? effectiveSelectedBindingIndex - 1 : effectiveSelectedBindingIndex + 1;
 
     if (targetIndex < 0 || targetIndex >= bindings.length) {
       return;
     }
 
     const nextBindings = [...bindings];
-    const current = nextBindings[selectedBindingIndex];
-    nextBindings[selectedBindingIndex] = nextBindings[targetIndex];
+    const current = nextBindings[effectiveSelectedBindingIndex];
+    nextBindings[effectiveSelectedBindingIndex] = nextBindings[targetIndex];
     nextBindings[targetIndex] = current;
 
     setBindings(nextBindings, targetIndex);
@@ -179,7 +166,7 @@ export function BindingRulesEditor({ value, onChange, context }: StandardEditorP
     }
 
     const nextBindings = [...bindings];
-    nextBindings[selectedBindingIndex] = {
+    nextBindings[effectiveSelectedBindingIndex] = {
       ...selectedBinding,
       ...partial,
     };
@@ -203,14 +190,19 @@ export function BindingRulesEditor({ value, onChange, context }: StandardEditorP
         <Button size="sm" variant="destructive" onClick={removeSelectedBinding} disabled={!selectedBinding}>
           Supprimer binding
         </Button>
-        <Button size="sm" variant="secondary" onClick={() => moveSelectedBinding('up')} disabled={!selectedBinding || selectedBindingIndex === 0}>
+        <Button
+          size="sm"
+          variant="secondary"
+          onClick={() => moveSelectedBinding('up')}
+          disabled={!selectedBinding || effectiveSelectedBindingIndex === 0}
+        >
           Monter
         </Button>
         <Button
           size="sm"
           variant="secondary"
           onClick={() => moveSelectedBinding('down')}
-          disabled={!selectedBinding || selectedBindingIndex === bindings.length - 1}
+          disabled={!selectedBinding || effectiveSelectedBindingIndex === bindings.length - 1}
         >
           Descendre
         </Button>
@@ -224,7 +216,7 @@ export function BindingRulesEditor({ value, onChange, context }: StandardEditorP
           <Field label="Bindings existants">
             <Select
               options={bindingListOptions}
-              value={bindingListOptions.find((option) => option.value === selectedBindingIndex.toString())}
+              value={bindingListOptions.find((option) => option.value === effectiveSelectedBindingIndex.toString())}
               onChange={(selection) => {
                 const nextIndex = Number(selection?.value ?? 0);
                 setBindings(bindings, nextIndex);

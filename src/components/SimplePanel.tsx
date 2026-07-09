@@ -424,6 +424,7 @@ export const SimplePanel: React.FC<Props> = ({ options, data, width, height, onO
     startOffsetY: 0,
   });
   const [selectedElementId, setSelectedElementId] = useState<string | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
   const [zoom, setZoom] = useState(1);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
 
@@ -494,6 +495,7 @@ export const SimplePanel: React.FC<Props> = ({ options, data, width, height, onO
 
     const handleMouseUp = () => {
       dragRef.current.isDragging = false;
+      setIsDragging(false);
     };
 
     window.addEventListener('mousemove', handleMouseMove);
@@ -668,8 +670,9 @@ export const SimplePanel: React.FC<Props> = ({ options, data, width, height, onO
           dragRef.current.startY = event.clientY;
           dragRef.current.startOffsetX = offset.x;
           dragRef.current.startOffsetY = offset.y;
+          setIsDragging(true);
         }}
-        style={{ cursor: dragRef.current.isDragging ? 'grabbing' : 'grab' }}
+        style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
       >
         <div className={styles.svg} ref={svgRef} dangerouslySetInnerHTML={{ __html: svgMarkup }} />
       </div>
