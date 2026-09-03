@@ -27,7 +27,7 @@ jobs:
           MODULETS="$(find ./src -type f \( -name 'module.ts' -o -name 'module.tsx' \))"
           echo "modulets=${MODULETS}" >> "$GITHUB_OUTPUT"
       - name: Compatibility check
-        uses: grafana/plugin-actions/is-compatible@is-compatible/v1.0.2
+        uses: grafana/plugin-actions/is-compatible@is-compatible/v1.0.4
         with:
           module: ${{ steps.find-module-ts.outputs.modulets }}
           comment-pr: 'no'
