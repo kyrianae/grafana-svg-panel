@@ -1,5 +1,5 @@
 import { FieldType, StandardEditorProps } from '@grafana/data';
-import { Button, Field, Input, Select } from '@grafana/ui';
+import { Button, Combobox, Field, Input } from '@grafana/ui';
 import React, { useMemo, useState } from 'react';
 import { SvgBinding, SvgBindingAction } from '../types';
 
@@ -214,11 +214,11 @@ export function BindingRulesEditor({ value, onChange, context }: StandardEditorP
       {bindings.length > 0 ? (
         <>
           <Field label="Bindings existants">
-            <Select
+            <Combobox
               options={bindingListOptions}
-              value={bindingListOptions.find((option) => option.value === effectiveSelectedBindingIndex.toString())}
+              value={effectiveSelectedBindingIndex.toString()}
               onChange={(selection) => {
-                const nextIndex = Number(selection?.value ?? 0);
+                const nextIndex = Number(selection.value);
                 setBindings(bindings, nextIndex);
               }}
             />
@@ -235,18 +235,18 @@ export function BindingRulesEditor({ value, onChange, context }: StandardEditorP
               </Field>
 
               <Field label="Serie">
-                <Select
+                <Combobox
                   options={seriesOptions}
-                  value={seriesOptions.find((option) => option.value === selectedBinding.seriesName)}
-                  onChange={(selection) => updateSelectedBinding({ seriesName: selection?.value ?? '' })}
+                  value={selectedBinding.seriesName}
+                  onChange={(selection) => updateSelectedBinding({ seriesName: selection.value })}
                 />
               </Field>
 
               <Field label="Type de binding">
-                <Select
+                <Combobox
                   options={BINDING_ACTION_OPTIONS}
-                  value={BINDING_ACTION_OPTIONS.find((option) => option.value === selectedBinding.action)}
-                  onChange={(selection) => updateSelectedBinding({ action: (selection?.value ?? 'fill') as SvgBindingAction })}
+                  value={selectedBinding.action}
+                  onChange={(selection) => updateSelectedBinding({ action: selection.value as SvgBindingAction })}
                 />
               </Field>
 
