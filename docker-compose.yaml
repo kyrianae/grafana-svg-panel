@@ -1,7 +1,7 @@
 services:
   grafana:
     user: root
-    container_name: kyrianae-svg-panel-panel
+    container_name: grafana-svg-panel
     build:
       context: .
       dockerfile: Dockerfile
@@ -13,15 +13,15 @@ services:
     ports:
       - 3000:3000/tcp
     volumes:
-      - ./dist:/var/lib/grafana/plugins/kyrianae-svg-panel-panel
+      - ./dist:/var/lib/grafana/plugins/grafana-svg-panel
       - ./provisioning:/etc/grafana/provisioning
-      - .:/root/kyrianae-svg-panel-panel
+      - .:/root/grafana-svg-panel
     environment:
       NODE_ENV: development
-      GF_LOG_FILTERS: plugin.kyrianae-svg-panel-panel:debug
+      GF_LOG_FILTERS: plugin.grafana-svg-panel:debug
       GF_LOG_LEVEL: debug
       GF_DATAPROXY_LOGGING: 1
-      GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS: kyrianae-svg-panel-panel
+      GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS: grafana-svg-panel
 
   node:
     image: node:22-bookworm

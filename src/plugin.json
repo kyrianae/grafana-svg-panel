@@ -2,7 +2,7 @@
   "$schema": "https://raw.githubusercontent.com/grafana/grafana/main/docs/sources/developers/plugins/plugin.schema.json",
   "type": "panel",
   "name": "SVG Panel",
-  "id": "kyrianae-svg-panel-panel",
+  "id": "grafana-svg-panel",
   "info": {
     "keywords": ["panel", "svg", "visualization"],
     "description": "Render inline SVG markup and bind Grafana series to SVG elements.",
