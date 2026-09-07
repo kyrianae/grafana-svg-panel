@@ -29,8 +29,8 @@
     "@testing-library/react": "^16.3.0",
     "@types/jest": "^29.5.0",
     "@types/node": "^24.0.0",
-    "@types/react": "^18.3.0",
-    "@types/react-dom": "^18.3.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
     "@typescript-eslint/eslint-plugin": "^8.38.0",
     "@typescript-eslint/parser": "^8.38.0",
     "ajv": "^8.17.1",
@@ -71,13 +71,13 @@
   },
   "dependencies": {
     "@emotion/css": "11.10.6",
-    "@grafana/data": "12.4.2",
-    "@grafana/i18n": "12.4.2",
-    "@grafana/runtime": "12.4.2",
-    "@grafana/ui": "12.4.2",
-    "@grafana/schema": "12.4.2",
-    "react": "^18.3.0",
-    "react-dom": "^18.3.0"
+    "@grafana/data": "13.2.1",
+    "@grafana/i18n": "13.2.1",
+    "@grafana/runtime": "13.2.1",
+    "@grafana/ui": "13.2.1",
+    "@grafana/schema": "13.2.1",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
   },
   "overrides": {
     "react-data-grid": "7.0.0-beta.47"
